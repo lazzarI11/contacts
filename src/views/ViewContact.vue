@@ -10,16 +10,16 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-4"> 
-                <img src="https://img.icons8.com/?size=512&id=108652&format=png" alt="" class="contact-img-big">
+                <img :src="contact.photo" alt="" class="contact-img">
             </div>
             <div class="col-md-6">
                 <ul class="list-group">
-                    <li class="list-group-item">Name: <span class="fw-bold"> Name</span></li>
-                    <li class="list-group-item">Email: <span class="fw-bold"> Email</span></li>
-                    <li class="list-group-item">Mobile: <span class="fw-bold"> Mobile</span></li>
-                    <li class="list-group-item">Company: <span class="fw-bold"> Company</span></li>
-                    <li class="list-group-item">Title: <span class="fw-bold"> Title</span></li>
-                    <li class="list-group-item">Group: <span class="fw-bold"> Group</span></li>
+                    <li class="list-group-item">Name: <span class="fw-bold"> {{ contact.name }}</span></li>
+                    <li class="list-group-item">Email: <span class="fw-bold"> {{ contact.email }}</span></li>
+                    <li class="list-group-item">Mobile: <span class="fw-bold"> {{ contact.mobile }}</span></li>
+                    <li class="list-group-item">Company: <span class="fw-bold"> {{ contact.company }}</span></li>
+                    <li class="list-group-item">Title: <span class="fw-bold"> {{ contact.title }}</span></li>
+                    <li class="list-group-item">Group: <span class="fw-bold"> {{ contact.groupName }}</span></li>
                 </ul>
             </div>
         </div>
@@ -32,9 +32,32 @@
 </template>
 
 <script>
+import {contactService} from "@/services/contactService"
     export default{
-        name: "ViewContact"
+        name: "ViewContact",
+        data : function (){
+            return{
+                contact:{},
+                contactId:null,
+                errorMessage:null,
+                loading:false
+            }
+        },
+        created: async function (){
+            try{
+                this.loading = true;
+                this.contactId = this.$route.params.contactId;
+                let response = await contactService.getContactById(this.contactId);
+                this.contact = response.data.data;
+                this.loading = false;
+            }
+            catch(error){
+                this.errorMessage = error
+                this.loading = false;
+            }
+        },
     }
+    
 </script>
 
 <style scoped>
