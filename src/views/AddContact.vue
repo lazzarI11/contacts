@@ -21,7 +21,7 @@
                         <input v-model="contact.email" type="email" class="form-control" placeholder="Email">
                     </div>
                     <div class="mb-2">
-                        <input v-model="contact.mobile" type="number" class="form-control" placeholder="Mobile">
+                        <input v-model="contact.mobile" type="tel" class="form-control" placeholder="Mobile" maxlength="10">
                     </div>
                     <div class="mb-2">
                         <input v-model="contact.company" type="text" class="form-control" placeholder="CompanyName">
@@ -31,7 +31,7 @@
                     </div>
                     <div class="mb-2">
                         <select v-model="contact.groupId" class="form-control">
-                            <option value="">Select Group</option>
+                            <option value= null>Select Group</option>
                             <option :value="group.id" v-for="group of groups" :key="group">{{ group.name }}</option>
                         </select>
                     </div>
@@ -41,7 +41,7 @@
                 </form>
             </div>
             <div class="col-md-4">
-                <img :src="contact.photo" alt="" class="contact-img">
+                <img :src="contact.photo == '' ? defaultPhotoURL : contact.photo" alt="" class="contact-img">
             </div>
         </div>
     </div>
@@ -66,6 +66,7 @@ import {contactService} from "@/services/contactService"
                     title:'',
                     groupId: null
                 },
+                defaultPhotoURL:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQmcqzN9KSMx-hxPJfiB3yt59uQhN9R4IqjisfUEitJv9lbQVN14QYLsUfmgiH-AoH2VgTFMdRBaTWa9XXpU9aMV1fveYnRgRsf4peaqt_rCR_qyQ483NgjHHdhfYpOr8axyGWhk3DHw5lAUQkXl6NGMugPS7k6Apw7CUjqRMgwAv01i2_AXyRumuBfw/s458/blank-profile-picture-hd-images-photo.JPG",
                 groups:[],
                 errorMessage:null,
                 loading:false
@@ -75,7 +76,7 @@ import {contactService} from "@/services/contactService"
             try{
                 this.loading = true;
                 let response = await contactService.getAllGroups();
-                this.groups = response.data.data
+                this.groups = response.data.data,
                 this.loading = false;
             }
             catch(error){

@@ -3,8 +3,8 @@ export class contactService{
 
 static serverURl = 'http://548y122.e2.mars-hosting.com/api/';
 
-static getAllContacts(){
-    return axios.get(this.serverURl + 'contacts/all')
+static getAllContacts(name){
+    return axios.get(this.serverURl + `contacts/${name}`)
 }
 
 static getContactById(contactId){
@@ -19,9 +19,9 @@ static editContact(contact, contactId){
     return axios.post(this.serverURl + `contacts/edit/${contactId}`,this.makePayload(contact));
 }
 
-// static deleteContact(contactId){
-//     return axios.get(this.serverURl + `delete/${contactId}`)
-// }
+static deleteContact(contactId){
+    return axios.delete(this.serverURl + `contacts/delete/${contactId}`)
+}
 
 static getAllGroups(){
     return axios.get(this.serverURl + 'groups')

@@ -12,26 +12,26 @@
             <div class="col-md-4">
                 <form @submit.prevent="update()">
                     <div class="mb-2">
-                        <input v-model="upddatedContact.name" type="text" class="form-control" :placeholder = contact.name>
+                        <input v-model="updatedContact.name" type="text" class="form-control" :placeholder = contact.contact_name>
                     </div>
                     <div class="mb-2">
-                        <input v-model="upddatedContact.photo" type="text" class="form-control" :placeholder = contact.photo>
+                        <input v-model="updatedContact.photo" type="text" class="form-control" :placeholder = contact.contact_photo>
                     </div>
                     <div class="mb-2">
-                        <input v-model="upddatedContact.email" type="email" class="form-control" :placeholder=contact.email>
+                        <input v-model="updatedContact.email" type="email" class="form-control" :placeholder=contact.contact_email>
                     </div>
                     <div class="mb-2">
-                        <input v-model="upddatedContact.mobile" type="number" class="form-control" :placeholder= contact.mobile>
+                        <input v-model="updatedContact.mobile" type="tel" class="form-control" :placeholder= contact.contact_mobile maxlength="10">
                     </div>
                     <div class="mb-2">
-                        <input v-model="upddatedContact.company" type="text" class="form-control" :placeholder="contact.company">
+                        <input v-model="updatedContact.company" type="text" class="form-control" :placeholder="contact.contact_company">
                     </div>
                     <div class="mb-2">
-                        <input v-model="upddatedContact.title" type="text" class="form-control" :placeholder="contact.title">
+                        <input v-model="updatedContact.title" type="text" class="form-control" :placeholder="contact.contact_title">
                     </div>
                     <div class="mb-2">
-                        <select v-model="upddatedContact.groupId" class="form-control">
-                            <option value="">Select Group</option>
+                        <select v-model="updatedContact.groupId" class="form-control">
+                            <option value = null>Select Group</option>
                             <option :value="group.id" v-for="group of groups" :key="group">{{ group.name }}</option>
                         </select>
                     </div>
@@ -41,7 +41,7 @@
                 </form>
             </div>
             <div class="col-md-4">
-                <img :src="contact.photo" alt="" class="contact-img">
+                <img :src="getPhoto()" alt="" class="contact-img">
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@ import {contactService} from "@/services/contactService"
         data : function (){
             return{
                 contact:{},
-                upddatedContact:{
+                updatedContact:{
                     name:'',
                     photo:'',
                     email:'',
@@ -63,6 +63,7 @@ import {contactService} from "@/services/contactService"
                     title:'',
                     groupId: null
                 },
+                photoURL:'',
                 groups:{},
                 contactId:null,
                 errorMessage:null,
@@ -73,10 +74,7 @@ import {contactService} from "@/services/contactService"
             try{
                 this.loading = true;
                 this.contactId = this.$route.params.contactId;
-                let response = await contactService.getContactById(this.contactId);
-                let responseGroups  = await contactService.getAllGroups();
-                this.groups = responseGroups.data.data;
-                this.contact = response.data.data;
+                this.fetchData();
                 this.loading = false;
             }
             catch(error){
@@ -85,20 +83,37 @@ import {contactService} from "@/services/contactService"
             }
         },
         methods:{
+            fetchData: async function(){
+                let response = await contactService.getContactById(this.contactId);
+                let responseGroups  = await contactService.getAllGroups();
+                this.groups = responseGroups.data.data;
+                this.contact = response.data.data;
+            },
             update: function () {
                 try {
-                    console.log(this.upddatedContact)
-                    const response = contactService.editContact(this.upddatedContact,this.contactId);
+                    console.log(this.contactId)
+                    const response = contactService.editContact(this.updatedContact,this.contactId);
                     if (response) {
-                    response.then((result) => {
-                        const id = result.data.data.id;
-                        this.$router.push(`/contacts/view/${id}`);
-                    });
-                    } else {
+                        const contactId = this.$route.params.contactId;
+                        this.$router.replace({name:"ViewContact",params:contactId})
+                    }
+                        else {
                     this.$router.push("/");
                     }
-                } catch (error) {
+                    }
+                 catch (error) {
                     console.log(error);
+                }
+            },
+            getPhoto: function(){
+                if(this.updatedContact.photo == ''){
+                    return this.contact.photo
+                }
+                else if(this.contact.photo != this.updatedContact.photo){
+                    return this.updatedContact.photo
+                }
+                else{
+                    return this.contact.photo
                 }
             }
         }
